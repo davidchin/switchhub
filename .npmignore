@@ -1,0 +1,12 @@
+.*.md
+.gitignore
+.npmignore
+.nyc_output
+*.log
+build
+coverage
+docs
+node_modules
+test
+tsconfig.json
+tslint.json

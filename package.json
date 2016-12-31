@@ -1,0 +1,36 @@
+{
+  "name": "switchhub",
+  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/davidchin/switchhub.git"
+  },
+  "homepage": "https://github.com/davidchin/switchhub",
+  "description": "",
+  "keywords": [],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "prebuild": "npm run coverage",
+    "build": "rm -rf lib && tsc",
+    "coverage": "nyc --extension .ts npm test",
+    "lint": "tslint './+(src|test)/**/*.ts'",
+    "prepublish": "npm run build",
+    "pretest": "npm run lint",
+    "test": "mocha --compilers ts:ts-node/register ./test"
+  },
+  "author": "David Chin",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/chai": "~3.4.34",
+    "@types/mocha": "~2.2.34",
+    "@types/sinon": "~1.16.33",
+    "chai": "~3.5.0",
+    "mocha": "~3.2.0",
+    "nyc": "~10.0.0",
+    "sinon": "~1.17.6",
+    "ts-node": "~1.7.2",
+    "tslint": "~4.2.0",
+    "typescript": "~2.1.4"
+  }
+}
