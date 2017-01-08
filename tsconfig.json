@@ -1,4 +1,5 @@
 {
+    "compileOnSave": false,
     "compilerOptions": {
         "declaration": true,
         "forceConsistentCasingInFileNames": true,
@@ -14,17 +15,13 @@
         "outDir": "lib",
         "preserveConstEnums": true,
         "removeComments": true,
-        "rootDirs": [
-            "src",
-            "test"
-        ],
         "skipLibCheck": true,
         "sourceMap": true,
         "strictNullChecks": true,
         "stripInternal": true,
         "target": "es5",
         "types": [
-            "mocha"
+            "node"
         ]
     },
     "include": [
