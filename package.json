@@ -21,6 +21,7 @@
   "scripts": {
     "prebuild": "npm run coverage",
     "build": "rm -rf lib && tsc",
+    "changelog": "conventional-changelog --preset angular --infile CHANGELOG.md --same-file",
     "coverage": "nyc --reporter text --reporter html --extension .ts npm test",
     "lint": "tslint './+(src|test)/**/*.ts'",
     "prepublish": "npm run build",
@@ -35,6 +36,7 @@
     "@types/node": "~6.0.55",
     "@types/sinon": "~1.16.33",
     "chai": "~3.5.0",
+    "conventional-changelog-cli": "~1.2.0",
     "mocha": "~3.2.0",
     "nyc": "~10.0.0",
     "sinon": "~1.17.6",
