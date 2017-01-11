@@ -9,7 +9,7 @@ export default class Transitioner {
         this.transitions = transitions;
     }
 
-    canTransition(toState: Key, fromState: Key) {
+    canTransition(toState: Key, fromState: Key): boolean {
         const transitions = this.transitions.filterTransitions({
             from: fromState,
             to: toState,
@@ -24,7 +24,7 @@ export default class Transitioner {
         });
     }
 
-    transition(toState: Key, fromState: Key, callback: (transition: Transition) => void) {
+    transition(toState: Key, fromState: Key, callback: (transition: Transition) => void): void {
         if (!this.transitions.hasTransition({ from: fromState })) {
             throw new Error(`State not found: ${fromState}`);
         }
@@ -43,7 +43,7 @@ export default class Transitioner {
         });
     }
 
-    transitionByEvent(event: Key, fromState: Key, callback: (transition: Transition) => void) {
+    transitionByEvent(event: Key, fromState: Key, callback: (transition: Transition) => void): void {
         if (!this.transitions.hasTransition({ from: fromState })) {
             throw new Error(`State not found: ${fromState}`);
         }

@@ -31,6 +31,10 @@
         "no-consecutive-blank-lines": true,
         "no-duplicate-variable": true,
         "no-eval": true,
+        "no-inferrable-types": [
+            true,
+            "ignore-params"
+        ],
         "no-internal-module": true,
         "no-parameter-properties": true,
         "no-require-imports": true,
@@ -63,6 +67,11 @@
         "semicolon": [
             true,
             "always"
+        ],
+        "typedef": [
+            true,
+            "call-signature",
+            "parameter"
         ],
         "switch-default": true,
         "trailing-comma": true,
