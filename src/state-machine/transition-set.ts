@@ -19,6 +19,10 @@ export default class TransitionSet {
         this.transitions.push(transition);
     }
 
+    addTransitions(transitions: Transition[]): void {
+        transitions.forEach(transition => this.addTransition(transition));
+    }
+
     addEvent(event: Event): void {
         if (event.transitions.length === 0) {
             throw new Error(`Event "${event}" must have at least one transition`);
@@ -27,6 +31,10 @@ export default class TransitionSet {
         event.transitions.forEach(transition => {
             this.addTransition({ ...transition, event: event.name});
         });
+    }
+
+    addEvents(events: Event[]): void {
+        events.forEach(event => this.addEvent(event));
     }
 
     removeTransition(transition: Transition): void {
@@ -39,6 +47,10 @@ export default class TransitionSet {
         this.transitions.splice(index, 1);
     }
 
+    removeTransitions(transitions: Transition[]): void {
+        transitions.forEach(transition => this.removeTransition(transition));
+    }
+
     removeEvent(eventName: Key): void {
         let index = this.transitions.length;
 
@@ -49,6 +61,10 @@ export default class TransitionSet {
 
             this.transitions.splice(index, 1);
         }
+    }
+
+    removeEvents(eventNames: Key[]): void {
+        eventNames.forEach(eventName => this.removeEvent(eventName));
     }
 
     hasTransition(predicate: Predicate): boolean {

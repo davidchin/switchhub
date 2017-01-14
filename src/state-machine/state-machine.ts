@@ -1,3 +1,4 @@
+import Event from './event';
 import Key from './key';
 import Subscriber from './subscriber';
 import SubscriberSet from './subscriber-set';
@@ -35,8 +36,16 @@ export default class StateMachine {
         this.transitions.addEvent({ name, transitions });
     }
 
+    addEvents(events: Event[]): void {
+        this.transitions.addEvents(events);
+    }
+
     removeEvent(name: Key): void {
         this.transitions.removeEvent(name);
+    }
+
+    removeEvents(names: Key[]): void {
+        this.transitions.removeEvents(names);
     }
 
     hasEvent(name: Key): boolean {
@@ -47,8 +56,16 @@ export default class StateMachine {
         this.transitions.addTransition(transition);
     }
 
+    addTransitions(transitions: Transition[]): void {
+        this.transitions.addTransitions(transitions);
+    }
+
     removeTransition(transition: Transition): void {
         this.transitions.removeTransition(transition);
+    }
+
+    removeTransitions(transitions: Transition[]): void {
+        this.transitions.removeTransitions(transitions);
     }
 
     hasTransition(transition: Transition): boolean {

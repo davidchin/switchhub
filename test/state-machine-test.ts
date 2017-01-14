@@ -193,12 +193,70 @@ describe('StateMachine', () => {
         expect(stateMachine.hasTransition({ from: SampleState.Parked, to: 'TestState' })).to.equal(true);
     });
 
+    it('registers multiple events', () => {
+        stateMachine = StateMachine.create(SampleState.Parked);
+
+        expect(stateMachine.hasEvent(SampleEvent.Park)).to.equal(false);
+        expect(stateMachine.hasEvent(SampleEvent.Ignite)).to.equal(false);
+
+        stateMachine.addEvents([
+            {
+                name: SampleEvent.Park,
+                transitions: [
+                    { from: SampleState.Idling, to: SampleState.Parked },
+                    { from: SampleState.FirstGear, to: SampleState.Parked },
+                ],
+            },
+            {
+                name: SampleEvent.Ignite,
+                transitions: [
+                    { from: SampleState.Stalled, to: SampleState.Stalled },
+                    { from: SampleState.Parked, to: SampleState.Idling },
+                ],
+            },
+        ]);
+
+        expect(stateMachine.hasEvent(SampleEvent.Park)).to.equal(true);
+        expect(stateMachine.hasEvent(SampleEvent.Ignite)).to.equal(true);
+    });
+
+    it('registers multiple transitions', () => {
+        const transitions = [
+            { from: SampleState.Idling, to: SampleState.Parked },
+            { from: SampleState.FirstGear, to: SampleState.Parked },
+            { from: SampleState.Stalled, to: SampleState.Stalled },
+            { from: SampleState.Parked, to: SampleState.Idling },
+        ];
+
+        stateMachine = StateMachine.create(SampleState.Parked);
+
+        transitions.forEach(transition => {
+            expect(stateMachine.hasTransition(transition)).to.equal(false);
+        });
+
+        stateMachine.addTransitions(transitions);
+
+        transitions.forEach(transition => {
+            expect(stateMachine.hasTransition(transition)).to.equal(true);
+        });
+    });
+
     it('removes a registered event', () => {
         expect(stateMachine.hasEvent(SampleEvent.Ignite)).to.equal(true);
 
         stateMachine.removeEvent(SampleEvent.Ignite);
 
         expect(stateMachine.hasEvent(SampleEvent.Ignite)).to.equal(false);
+    });
+
+    it('removes multiple registered events', () => {
+        expect(stateMachine.hasEvent(SampleEvent.Park)).to.equal(true);
+        expect(stateMachine.hasEvent(SampleEvent.Park)).to.equal(true);
+
+        stateMachine.removeEvents([SampleEvent.Park, SampleEvent.Ignite]);
+
+        expect(stateMachine.hasEvent(SampleEvent.Park)).to.equal(false);
+        expect(stateMachine.hasEvent(SampleEvent.Park)).to.equal(false);
     });
 
     it('removes a registered transition', () => {
@@ -209,6 +267,19 @@ describe('StateMachine', () => {
         stateMachine.removeTransition(transition);
 
         expect(stateMachine.hasTransition(transition)).to.equal(false);
+    });
+
+    it('removes multiple registered transitions', () => {
+        const transitionA = { from: SampleState.Parked, to: SampleState.Idling };
+        const transitionB = { from: SampleState.Idling, to: SampleState.FirstGear };
+
+        expect(stateMachine.hasTransition(transitionA)).to.equal(true);
+        expect(stateMachine.hasTransition(transitionB)).to.equal(true);
+
+        stateMachine.removeTransitions([transitionA, transitionB]);
+
+        expect(stateMachine.hasTransition(transitionA)).to.equal(false);
+        expect(stateMachine.hasTransition(transitionB)).to.equal(false);
     });
 
     it('ignores the call when trying to remove an unknown event', () => {
