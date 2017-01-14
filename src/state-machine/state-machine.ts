@@ -11,6 +11,7 @@ export default class StateMachine {
     }
 
     private currentState: Key;
+    private previousState?: Key;
     private subscribers: SubscriberSet;
     private transitioner: Transitioner;
     private transitions: TransitionSet;
@@ -24,6 +25,10 @@ export default class StateMachine {
 
     getState(): Key {
         return this.currentState;
+    }
+
+    getPreviousState(): Key | undefined {
+        return this.previousState;
     }
 
     addEvent(name: Key, transitions: Transition[]): void {
@@ -56,6 +61,7 @@ export default class StateMachine {
 
     transition(state: Key): void {
         this.transitioner.transition(state, this.currentState, transition => {
+            this.previousState = transition.from;
             this.currentState = transition.to;
 
             this.subscribers.notifySubscribers({
@@ -67,6 +73,7 @@ export default class StateMachine {
 
     transitionByEvent(event: Key): void {
         this.transitioner.transitionByEvent(event, this.currentState, transition => {
+            this.previousState = transition.from;
             this.currentState = transition.to;
 
             this.subscribers.notifySubscribers({

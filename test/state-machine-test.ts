@@ -46,6 +46,16 @@ describe('StateMachine', () => {
         expect(stateMachine.getState()).to.equal(SampleState.Idling);
     });
 
+    it('returns the previous state after a transition', () => {
+        stateMachine.transitionByEvent(SampleEvent.Ignite);
+
+        expect(stateMachine.getPreviousState()).to.equal(SampleState.Parked);
+
+        stateMachine.transitionByEvent(SampleEvent.ShiftUp);
+
+        expect(stateMachine.getPreviousState()).to.equal(SampleState.Idling);
+    });
+
     it('keeps its current state if unable to transition by event', () => {
         stateMachine.transitionByEvent(SampleEvent.ShiftDown);
 
