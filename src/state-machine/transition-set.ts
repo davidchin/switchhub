@@ -20,6 +20,10 @@ export default class TransitionSet {
     }
 
     addEvent(event: Event): void {
+        if (event.transitions.length === 0) {
+            throw new Error(`Event "${event}" must have at least one transition`);
+        }
+
         event.transitions.forEach(transition => {
             this.addTransition({ ...transition, event: event.name});
         });

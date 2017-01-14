@@ -244,4 +244,8 @@ describe('StateMachine', () => {
         expect(() => stateMachine.transitionByEvent(SampleEvent.Park)).to.throw(Error);
         expect(() => stateMachine.transition(SampleState.Parked)).to.throw(Error);
     });
+
+    it('throws an error when registering an event without at least one transition', () => {
+        expect(() => stateMachine.addEvent('EventA', [])).to.throw(Error);
+    });
 });
