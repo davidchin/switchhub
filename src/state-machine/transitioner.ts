@@ -26,11 +26,11 @@ export default class Transitioner {
 
     transition(toState: Key, fromState: Key, callback: (transition: Transition) => void): void {
         if (!this.transitions.hasTransition({ from: fromState })) {
-            throw new Error(`State not found: ${fromState}`);
+            throw new Error(`"From" state not found: ${fromState}`);
         }
 
         if (!this.transitions.hasTransition({ to: toState })) {
-            throw new Error(`State not found: ${toState}`);
+            throw new Error(`"To" state not found: ${toState}`);
         }
 
         if (!this.canTransition(toState, fromState)) {
@@ -45,7 +45,7 @@ export default class Transitioner {
 
     transitionByEvent(event: Key, fromState: Key, callback: (transition: Transition) => void): void {
         if (!this.transitions.hasTransition({ from: fromState })) {
-            throw new Error(`State not found: ${fromState}`);
+            throw new Error(`"From" state not found: ${fromState}`);
         }
 
         if (!this.transitions.hasEvent(event)) {
