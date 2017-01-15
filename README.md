@@ -2,6 +2,8 @@
 
 SwitchHub is a finite state machine written for JavaScript. It can help you manage the state of an object declaratively.
 
+[![Build Status](https://travis-ci.org/davidchin/switchhub.svg?branch=master)](https://travis-ci.org/davidchin/switchhub)
+
 ## Installation
 
 You can use npm to install this library.

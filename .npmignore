@@ -2,6 +2,7 @@
 .gitignore
 .npmignore
 .nyc_output
+.travis.yml
 *.log
 build
 coverage
