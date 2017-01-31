@@ -23,6 +23,7 @@
     "build": "rm -rf lib && tsc",
     "changelog": "conventional-changelog --preset angular --infile CHANGELOG.md --same-file",
     "coverage": "nyc --reporter text --reporter html --extension .ts --check-coverage --lines 95 npm test",
+    "docs": "typedoc --excludePrivate --target es6 --out docs src",
     "lint": "tslint './+(src|test)/**/*.ts'",
     "prepublish": "npm run build",
     "pretest": "npm run lint",
@@ -42,6 +43,7 @@
     "sinon": "~1.17.6",
     "ts-node": "~1.7.2",
     "tslint": "~4.3.0",
+    "typedoc": "~0.5.5",
     "typescript": "~2.1.4"
   }
 }
