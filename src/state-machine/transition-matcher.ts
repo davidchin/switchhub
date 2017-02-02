@@ -11,7 +11,7 @@ export function matchTransition(transition: Transition, predicate: Predicate): b
     const props = ['event', 'from', 'to'];
 
     return props.every(prop => {
-        if (!predicate[prop]) {
+        if (predicate[prop] === undefined || predicate[prop] === null) {
             return true;
         }
 
