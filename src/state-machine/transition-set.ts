@@ -132,6 +132,11 @@ export default class TransitionSet {
         return this.transitions.filter(transition => matchTransition(transition, predicate));
     }
 
+    /**
+     * Find the index of a transition using a predicate.
+     * @param predicate - The predicate used for searching
+     * @return The index of the transition. Return -1 if it is not found.
+     */
     private findIndex(predicate: Predicate): number {
         for (let index = 0; index < this.transitions.length; index++) {
             const transition = this.transitions[index];
