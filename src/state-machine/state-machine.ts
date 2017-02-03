@@ -15,10 +15,11 @@ export default class StateMachine {
     /**
      * Create a `StateMachine` instance.
      * @param initialState - The initial state
+     * @param [events] - An array of events
      * @return A `StateMachine` instance
      */
-    static create(initialState: Key): StateMachine {
-        return new StateMachine(initialState);
+    static create(initialState: Key, events?: Event[]): StateMachine {
+        return new StateMachine(initialState, events);
     }
 
     private currentState: Key;
@@ -29,12 +30,17 @@ export default class StateMachine {
 
     /**
      * @param initialState - The initial state
+     * @param [events] - An array of events
      */
-    constructor(initialState: Key) {
+    constructor(initialState: Key, events?: Event[]) {
         this.currentState = initialState;
         this.subscribers = new SubscriberSet();
         this.transitions = new TransitionSet();
         this.transitioner = new Transitioner(this.transitions);
+
+        if (events) {
+            this.addEvents(events);
+        }
     }
 
     /**

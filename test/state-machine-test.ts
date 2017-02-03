@@ -220,6 +220,28 @@ describe('StateMachine', () => {
         expect(stateMachine.hasEvent(SampleEvent.Ignite)).to.equal(true);
     });
 
+    it('registers multiple events when creating the instance', () => {
+        stateMachine = StateMachine.create(SampleState.Parked, [
+            {
+                name: SampleEvent.Park,
+                transitions: [
+                    { from: SampleState.Idling, to: SampleState.Parked },
+                    { from: SampleState.FirstGear, to: SampleState.Parked },
+                ],
+            },
+            {
+                name: SampleEvent.Ignite,
+                transitions: [
+                    { from: SampleState.Stalled, to: SampleState.Stalled },
+                    { from: SampleState.Parked, to: SampleState.Idling },
+                ],
+            },
+        ]);
+
+        expect(stateMachine.hasEvent(SampleEvent.Park)).to.equal(true);
+        expect(stateMachine.hasEvent(SampleEvent.Ignite)).to.equal(true);
+    });
+
     it('registers multiple transitions', () => {
         const transitions = [
             { from: SampleState.Idling, to: SampleState.Parked },
