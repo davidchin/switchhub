@@ -63,13 +63,13 @@ To transition to a new state by triggering an event.
 
 ```js
 // Given the initial state is 'inactive'
-stateMachine.transitionByEvent('activate');
+stateMachine.triggerEvent('activate');
 // stateMachine.getState() === 'active'
 
-stateMachine.transitionByEvent('pause');
+stateMachine.triggerEvent('pause');
 // stateMachine.getState() === 'paused'
 
-stateMachine.transitionByEvent('deactivate');
+stateMachine.triggerEvent('deactivate');
 // stateMachine.getState() === 'inactive'
 ```
 
@@ -135,7 +135,7 @@ class Device {
     }
 
     activate() {
-        this._stateMachine.transitionByEvent('activate');
+        this._stateMachine.triggerEvent('activate');
     }
 
     handleChange(transition) {

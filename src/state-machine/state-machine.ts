@@ -170,8 +170,8 @@ export default class StateMachine {
      * once the transition is completed.
      * @param event - The event name
      */
-    transitionByEvent(event: Key): void {
-        this.transitioner.transitionByEvent(event, this.currentState, transition => {
+    triggerEvent(event: Key): void {
+        this.transitioner.triggerEvent(event, this.currentState, transition => {
             this.previousState = transition.from;
             this.currentState = transition.to;
 

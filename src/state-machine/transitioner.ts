@@ -70,7 +70,7 @@ export default class Transitioner {
      * @param fromState - The state to transition from.
      * @param callback - The callback to fire once the transition is completed
      */
-    transitionByEvent(event: Key, fromState: Key, callback: (transition: Transition) => void): void {
+    triggerEvent(event: Key, fromState: Key, callback: (transition: Transition) => void): void {
         if (!this.transitions.hasTransition({ from: fromState })) {
             throw new Error(`"From" state not found: ${fromState}`);
         }

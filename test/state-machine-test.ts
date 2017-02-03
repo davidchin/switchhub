@@ -41,23 +41,23 @@ describe('StateMachine', () => {
     });
 
     it('transitions to a state by event', () => {
-        stateMachine.transitionByEvent(SampleEvent.Ignite);
+        stateMachine.triggerEvent(SampleEvent.Ignite);
 
         expect(stateMachine.getState()).to.equal(SampleState.Idling);
     });
 
     it('returns the previous state after a transition', () => {
-        stateMachine.transitionByEvent(SampleEvent.Ignite);
+        stateMachine.triggerEvent(SampleEvent.Ignite);
 
         expect(stateMachine.getPreviousState()).to.equal(SampleState.Parked);
 
-        stateMachine.transitionByEvent(SampleEvent.ShiftUp);
+        stateMachine.triggerEvent(SampleEvent.ShiftUp);
 
         expect(stateMachine.getPreviousState()).to.equal(SampleState.Idling);
     });
 
     it('keeps its current state if unable to transition by event', () => {
-        stateMachine.transitionByEvent(SampleEvent.ShiftDown);
+        stateMachine.triggerEvent(SampleEvent.ShiftDown);
 
         expect(stateMachine.getState()).to.equal(SampleState.Parked);
     });
@@ -81,13 +81,13 @@ describe('StateMachine', () => {
             { from: SampleState.Parked, to: SampleState.Damaged, condition: () => canCrash },
         ]);
 
-        stateMachine.transitionByEvent(SampleEvent.Crash);
+        stateMachine.triggerEvent(SampleEvent.Crash);
 
         expect(stateMachine.getState()).not.to.equal(SampleState.Damaged);
 
         canCrash = true;
 
-        stateMachine.transitionByEvent(SampleEvent.Crash);
+        stateMachine.triggerEvent(SampleEvent.Crash);
 
         expect(stateMachine.getState()).to.equal(SampleState.Damaged);
     });
@@ -99,12 +99,12 @@ describe('StateMachine', () => {
         stateMachine.subscribe(subscriberA);
         stateMachine.subscribe(subscriberB);
 
-        stateMachine.transitionByEvent(SampleEvent.ShiftUp);
+        stateMachine.triggerEvent(SampleEvent.ShiftUp);
 
         expect(subscriberA.called).to.equal(false);
         expect(subscriberB.called).to.equal(false);
 
-        stateMachine.transitionByEvent(SampleEvent.Ignite);
+        stateMachine.triggerEvent(SampleEvent.Ignite);
 
         expect(subscriberA.calledWith({ event: SampleEvent.Ignite, from: SampleState.Parked, to: SampleState.Idling })).to.equal(true);
         expect(subscriberB.calledWith({ event: SampleEvent.Ignite, from: SampleState.Parked, to: SampleState.Idling })).to.equal(true);
@@ -142,7 +142,7 @@ describe('StateMachine', () => {
 
         stateMachine.subscribe(subscriber);
         stateMachine.unsubscribe(subscriber);
-        stateMachine.transitionByEvent(SampleEvent.Ignite);
+        stateMachine.triggerEvent(SampleEvent.Ignite);
 
         expect(subscriber.called).to.equal(false);
     });
@@ -301,7 +301,7 @@ describe('StateMachine', () => {
     });
 
     it('throws an error when trying to dispatch an unknown event', () => {
-        expect(() => stateMachine.transitionByEvent('UnknownEvent')).to.throw(Error);
+        expect(() => stateMachine.triggerEvent('UnknownEvent')).to.throw(Error);
     });
 
     it('throws an error when trying to transition without a valid initial state', () => {
@@ -312,7 +312,7 @@ describe('StateMachine', () => {
             { from: SampleState.FirstGear, to: SampleState.Parked },
         ]);
 
-        expect(() => stateMachine.transitionByEvent(SampleEvent.Park)).to.throw(Error);
+        expect(() => stateMachine.triggerEvent(SampleEvent.Park)).to.throw(Error);
         expect(() => stateMachine.transition(SampleState.Parked)).to.throw(Error);
     });
 
