@@ -1,3 +1,13 @@
+<a name="0.2.1"></a>
+## [0.2.1](https://github.com/davidchin/switchhub/compare/0.2.0...v0.2.1) (2017-02-03)
+
+
+### Bug Fixes
+
+* When matching transitions, make sure the filter condition is undefined before skipping ([42ddf5b](https://github.com/davidchin/switchhub/commit/42ddf5b))
+
+
+
 <a name="0.2.0"></a>
 # [0.2.0](https://github.com/davidchin/switchhub/compare/0.1.0...0.2.0) (2017-01-14)
 
