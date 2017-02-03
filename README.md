@@ -64,25 +64,25 @@ To transition to a new state by triggering an event.
 ```js
 // Given the initial state is 'inactive'
 stateMachine.transitionByEvent('activate');
-assert(stateMachine.getState() === 'active');
+// stateMachine.getState() === 'active'
 
 stateMachine.transitionByEvent('pause');
-assert(stateMachine.getState() === 'paused');
+// stateMachine.getState() === 'paused'
 
 stateMachine.transitionByEvent('deactivate');
-assert(stateMachine.getState() === 'inactive');
+// stateMachine.getState() === 'inactive'
 ```
 
 You can also directly transition to a new state, if it is related to the current state.
 
 ```js
-// Given the current state is 'inactive'
+// Given the current state is 'inactive', you can transition to 'active'
 stateMachine.transition('active');
-assert(stateMachine.getState() === 'active');
+// stateMachine.getState() === 'active'
 
-// Given the current state is 'paused'
+// Given the current state is 'paused', you cannot transition to 'inactive'
 stateMachine.transition('inactive');
-assert(stateMachine.getState() !== 'inactive'); // The current state is still 'paused'.
+// stateMachine.getState() !== 'inactive'
 ```
 
 ### Subscribe to changes
@@ -91,9 +91,9 @@ You can subscribe to state changes.
 
 ```js
 stateMachine.subscribe(transition => {
-    assert(transition.event === 'activate');
-    assert(transition.from === 'inactive');
-    assert(transition.to === 'active');
+    // transition.event === 'activate'
+    // transition.from === 'inactive'
+    // transition.to === 'active'
 });
 
 stateMachine.subscribe(transition => {
