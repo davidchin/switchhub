@@ -1,8 +1,8 @@
-import { default as Predicate } from './transition-predicate';
 import { matchTransition } from './transition-matcher';
 import Event from './event';
 import Key from './key';
 import Transition from './transition';
+import TransitionPredicate from './transition-predicate';
 
 /**
  * A class responsible for storing and retrieving a set of transitions.
@@ -110,7 +110,7 @@ export default class TransitionSet {
      * @param predicate - The predicate used for filtering
      * @return True if the transition exists
      */
-    hasTransition(predicate: Predicate): boolean {
+    hasTransition(predicate: TransitionPredicate): boolean {
         return this.filterTransitions(predicate).length > 0;
     }
 
@@ -124,12 +124,29 @@ export default class TransitionSet {
     }
 
     /**
-     * Filter its registered transitions with a set of criteria.
+     * Filter registered transitions with a set of criteria.
      * @param predicate - The predicate used for filtering
      * @return An array of transitions matching the predicate
      */
-    filterTransitions(predicate: Predicate): Transition[] {
+    filterTransitions(predicate: TransitionPredicate): Transition[] {
         return this.transitions.filter(transition => matchTransition(transition, predicate));
+    }
+
+    /**
+     * Filter executable transitions with a set of criteria.
+     * @param predicate - The predicate used for filtering
+     * @return An array of transitions matching the predicate
+     */
+    filterExecutableTransitions(predicate: TransitionPredicate): Transition[] {
+        const transitions = this.filterTransitions(predicate);
+
+        return transitions.filter(transition => {
+            if (transition.condition) {
+                return transition.condition() !== false;
+            }
+
+            return true;
+        });
     }
 
     /**
@@ -137,7 +154,7 @@ export default class TransitionSet {
      * @param predicate - The predicate used for searching
      * @return The index of the transition. Return -1 if it is not found.
      */
-    private findIndex(predicate: Predicate): number {
+    private findIndex(predicate: TransitionPredicate): number {
         for (let index = 0; index < this.transitions.length; index++) {
             const transition = this.transitions[index];
 

@@ -1,7 +1,7 @@
-import Transition from './transition';
+import SubscriberPayload from './subscriber-payload';
 
 interface Subscriber {
-    (transition: Transition): void;
+    (payload: SubscriberPayload): void;
 }
 
 export default Subscriber;

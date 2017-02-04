@@ -1,4 +1,4 @@
-import { default as Predicate } from './transition-predicate';
+import TransitionPredicate from './transition-predicate';
 import Transition from './transition';
 
 /**
@@ -7,7 +7,7 @@ import Transition from './transition';
  * @param predicate - The predicate used for filtering
  * @return True if the transition matches the criteria.
  */
-export function matchTransition(transition: Transition, predicate: Predicate): boolean {
+export function matchTransition(transition: Transition, predicate: TransitionPredicate): boolean {
     const props = ['event', 'from', 'to'];
 
     return props.every(prop => {

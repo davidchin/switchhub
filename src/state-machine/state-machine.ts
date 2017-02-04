@@ -4,6 +4,9 @@ import Subscriber from './subscriber';
 import SubscriberSet from './subscriber-set';
 import Transition from './transition';
 import Transitioner from './transitioner';
+import TransitionHistory from './transition-history';
+import TransitionPredicate from './transition-predicate';
+import TransitionRecord from './transition-record';
 import TransitionSet from './transition-set';
 
 /**
@@ -22,8 +25,7 @@ export default class StateMachine {
         return new StateMachine(initialState, events);
     }
 
-    private currentState: Key;
-    private previousState?: Key;
+    private history: TransitionHistory;
     private subscribers: SubscriberSet;
     private transitioner: Transitioner;
     private transitions: TransitionSet;
@@ -33,10 +35,10 @@ export default class StateMachine {
      * @param [events] - An array of events
      */
     constructor(initialState: Key, events?: Event[]) {
-        this.currentState = initialState;
+        this.history = new TransitionHistory(initialState);
         this.subscribers = new SubscriberSet();
         this.transitions = new TransitionSet();
-        this.transitioner = new Transitioner(this.transitions);
+        this.transitioner = new Transitioner(this.transitions, this.history);
 
         if (events) {
             this.addEvents(events);
@@ -48,7 +50,7 @@ export default class StateMachine {
      * @return The current state
      */
     getState(): Key {
-        return this.currentState;
+        return this.history.getCurrentRecord().state;
     }
 
     /**
@@ -57,7 +59,17 @@ export default class StateMachine {
      * @return The previous state
      */
     getPreviousState(): Key | undefined {
-        return this.previousState;
+        const record = this.history.getPreviousRecord();
+
+        return record ? record.state : undefined;
+    }
+
+    /**
+     * Get the transition history and the current index
+     * @return The transition history and the current index
+     */
+    getHistory(): { index: number, stack: TransitionRecord[] } {
+        return this.history.getHistory();
     }
 
     /**
@@ -141,8 +153,8 @@ export default class StateMachine {
      * @param transition - The transition to check
      * @return True if the transition has been added
      */
-    hasTransition(transition: Transition): boolean {
-        return this.transitions.hasTransition(transition);
+    hasTransition(predicate: TransitionPredicate): boolean {
+        return this.transitions.hasTransition(predicate);
     }
 
     /**
@@ -151,7 +163,7 @@ export default class StateMachine {
      * @return True if it is possible to transition
      */
     canTransition(state: Key): boolean {
-        return this.transitioner.canTransition(state, this.currentState);
+        return this.transitioner.canTransition(state, this.getState());
     }
 
     /**
@@ -161,15 +173,8 @@ export default class StateMachine {
      * @param [data] - The meta data associated with the transition
      */
     transition(state: Key, data?: any): void {
-        this.transitioner.transition(state, this.currentState, transition => {
-            this.previousState = transition.from;
-            this.currentState = transition.to;
-
-            this.subscribers.notifySubscribers({
-                data,
-                from: transition.from,
-                to: transition.to,
-            });
+        this.transitioner.transition(state, this.getState(), data, ({ from, to }) => {
+            this.subscribers.notifySubscribers({ data, from, to });
         });
     }
 
@@ -180,16 +185,28 @@ export default class StateMachine {
      * @param [data] - The meta data associated with the transition
      */
     triggerEvent(event: Key, data?: any): void {
-        this.transitioner.triggerEvent(event, this.currentState, transition => {
-            this.previousState = transition.from;
-            this.currentState = transition.to;
+        this.transitioner.triggerEvent(event, this.getState(), data, ({ from, to }) => {
+            this.subscribers.notifySubscribers({ data, event, from, to });
+        });
+    }
 
-            this.subscribers.notifySubscribers({
-                data,
-                event,
-                from: transition.from,
-                to: transition.to,
-            });
+    /**
+     * Revert to the previous state. Notify subscribers once the transition is
+     * completed.
+     */
+    undoTransition(): void {
+        this.transitioner.undoTransition(({ data, event, from, to }) => {
+            this.subscribers.notifySubscribers({ data, event, from, to, undo: true });
+        });
+    }
+
+    /**
+     * Replay the reverted state. Notify subscribers once the transition is
+     * completed.
+     */
+    redoTransition(): void {
+        this.transitioner.redoTransition(({ data, event, from, to }) => {
+            this.subscribers.notifySubscribers({ data, event, from, to, redo: true });
         });
     }
 

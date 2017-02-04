@@ -95,6 +95,20 @@ stateMachine.subscribe(transition) => {
 stateMachine.triggerEvent('activate', { message: 'Hello world' });
 ```
 
+### Undo transitions
+
+You can undo / redo a transition if it is marked as undoable.
+
+```js
+stateMachine.addEvent('activate', [
+    { from: 'inactive', to: 'active', undoable: true },
+]);
+
+stateMachine.triggerEvent('activate');
+stateMachine.undoTransition();
+stateMachine.redoTransition();
+```
+
 ### Subscribe to changes
 
 You can subscribe to state changes.

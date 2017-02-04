@@ -1,5 +1,6 @@
 import Subscriber from './subscriber';
-import Transition from './transition';
+import SubscriberPayload from './subscriber-payload';
+import { omitNil } from '../utils';
 
 /**
  * A class responsible for managing and notifying subscribers. It can add,
@@ -38,11 +39,11 @@ export default class SubscriberSet {
 
     /**
      * Notify all registered subscribers about a transition.
-     * @param transition - The transition to notify
+     * @param payload - The payload to transmit
      */
-    notifySubscribers(transition: Transition): void {
+    notifySubscribers(payload: SubscriberPayload): void {
         this.subscribers.forEach(subscriber => {
-            subscriber(transition);
+            subscriber(omitNil(payload));
         });
     }
 }

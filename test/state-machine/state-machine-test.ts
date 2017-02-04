@@ -1,8 +1,8 @@
 import 'mocha';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import { SampleEvent, SampleState } from './mocks';
-import { StateMachine } from '../src';
+import { SampleEvent, SampleState } from '../mocks';
+import { StateMachine } from '../../src';
 
 describe('StateMachine', () => {
     let stateMachine: StateMachine;
@@ -211,6 +211,115 @@ describe('StateMachine', () => {
 
         expect(stateMachine.hasTransition({ from: SampleState.Parked, to: SampleState.Idling })).to.equal(true);
         expect(stateMachine.hasTransition({ from: SampleState.Parked, to: 'TestState' })).to.equal(true);
+    });
+
+    it('undoes a state transition if it is possible to revert', () => {
+        const subscriber = sinon.spy();
+
+        stateMachine = StateMachine.create(SampleState.Parked);
+
+        stateMachine.addEvent(SampleEvent.Ignite, [
+            { from: SampleState.Parked, to: SampleState.Idling, undoable: true },
+        ]);
+        stateMachine.subscribe(subscriber);
+        stateMachine.triggerEvent(SampleEvent.Ignite);
+
+        subscriber.reset();
+        stateMachine.undoTransition();
+
+        expect(stateMachine.getState()).to.equal(SampleState.Parked);
+        expect(subscriber.calledWith(sinon.match({ from: SampleState.Idling, to: SampleState.Parked }))).to.equal(true);
+    });
+
+    it('does not undo a state transition if there is nothing to undo', () => {
+        const subscriber = sinon.spy();
+
+        stateMachine = StateMachine.create(SampleState.Parked);
+
+        stateMachine.addEvent(SampleEvent.Ignite, [
+            { from: SampleState.Parked, to: SampleState.Idling, undoable: true },
+        ]);
+        stateMachine.subscribe(subscriber);
+        stateMachine.triggerEvent(SampleEvent.Ignite);
+
+        subscriber.reset();
+        stateMachine.undoTransition();
+        stateMachine.undoTransition();
+
+        expect(subscriber.callCount).to.equal(1);
+    });
+
+    it('redoes a state transition if there is a reverted state', () => {
+        const subscriber = sinon.spy();
+
+        stateMachine = StateMachine.create(SampleState.Parked);
+
+        stateMachine.addEvent(SampleEvent.Ignite, [
+            { from: SampleState.Parked, to: SampleState.Idling, undoable: true },
+        ]);
+        stateMachine.subscribe(subscriber);
+        stateMachine.triggerEvent(SampleEvent.Ignite);
+        stateMachine.undoTransition();
+
+        subscriber.reset();
+        stateMachine.redoTransition();
+
+        expect(stateMachine.getState()).to.equal(SampleState.Idling);
+        expect(subscriber.calledWith(sinon.match({ from: SampleState.Parked, to: SampleState.Idling }))).to.equal(true);
+    });
+
+    it('does not redo a state transition if there is nothing to redo', () => {
+        const subscriber = sinon.spy();
+
+        stateMachine = StateMachine.create(SampleState.Parked);
+
+        stateMachine.addEvent(SampleEvent.Ignite, [
+            { from: SampleState.Parked, to: SampleState.Idling, undoable: true },
+        ]);
+        stateMachine.subscribe(subscriber);
+        stateMachine.triggerEvent(SampleEvent.Ignite);
+        stateMachine.undoTransition();
+
+        subscriber.reset();
+        stateMachine.redoTransition();
+        stateMachine.redoTransition();
+
+        expect(subscriber.callCount).to.equal(1);
+    });
+
+    it('clears all future states when there is a new transition', () => {
+        const subscriber = sinon.spy();
+
+        stateMachine = StateMachine.create(SampleState.Parked);
+
+        stateMachine.addEvent(SampleEvent.Ignite, [
+            { from: SampleState.Parked, to: SampleState.Idling, undoable: true },
+        ]);
+        stateMachine.triggerEvent(SampleEvent.Ignite);
+        stateMachine.undoTransition();
+        stateMachine.triggerEvent(SampleEvent.Ignite);
+
+        subscriber.reset();
+        stateMachine.redoTransition();
+
+        expect(subscriber.called).to.equal(false);
+    });
+
+    it('limits the number of records in the history stack', () => {
+        const states = [];
+
+        for (let i = 0; i < 60; i++) {
+            states.push({ from: `step_${i}`, to: `step_${i + 1}` });
+        }
+
+        stateMachine = StateMachine.create('step_0');
+        stateMachine.addEvent('increment', states);
+
+        for (let i = 0; i < 60; i++) {
+            stateMachine.triggerEvent('increment');
+        }
+
+        expect(stateMachine.getHistory().stack.length).to.equal(50);
     });
 
     it('registers multiple events', () => {
