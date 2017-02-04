@@ -158,13 +158,15 @@ export default class StateMachine {
      * Transition to a new state by its name. Notify subscribers once the
      * transition is completed.
      * @param state - The new state
+     * @param [data] - The meta data associated with the transition
      */
-    transition(state: Key): void {
+    transition(state: Key, data?: any): void {
         this.transitioner.transition(state, this.currentState, transition => {
             this.previousState = transition.from;
             this.currentState = transition.to;
 
             this.subscribers.notifySubscribers({
+                data,
                 from: transition.from,
                 to: transition.to,
             });
@@ -175,13 +177,15 @@ export default class StateMachine {
      * Transition to a new state by triggering an event. Notify subscribers
      * once the transition is completed.
      * @param event - The event name
+     * @param [data] - The meta data associated with the transition
      */
-    triggerEvent(event: Key): void {
+    triggerEvent(event: Key, data?: any): void {
         this.transitioner.triggerEvent(event, this.currentState, transition => {
             this.previousState = transition.from;
             this.currentState = transition.to;
 
             this.subscribers.notifySubscribers({
+                data,
                 event,
                 from: transition.from,
                 to: transition.to,

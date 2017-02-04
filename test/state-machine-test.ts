@@ -106,8 +106,18 @@ describe('StateMachine', () => {
 
         stateMachine.triggerEvent(SampleEvent.Ignite);
 
-        expect(subscriberA.calledWith({ event: SampleEvent.Ignite, from: SampleState.Parked, to: SampleState.Idling })).to.equal(true);
-        expect(subscriberB.calledWith({ event: SampleEvent.Ignite, from: SampleState.Parked, to: SampleState.Idling })).to.equal(true);
+        expect(subscriberA.calledWith(sinon.match({ event: SampleEvent.Ignite, from: SampleState.Parked, to: SampleState.Idling }))).to.equal(true);
+        expect(subscriberB.calledWith(sinon.match({ event: SampleEvent.Ignite, from: SampleState.Parked, to: SampleState.Idling }))).to.equal(true);
+    });
+
+    it('passes additional data to all the subscribers after a successful state transition by event', () => {
+        const subscriber = sinon.spy();
+        const data = { message: 'Hello world' };
+
+        stateMachine.subscribe(subscriber);
+        stateMachine.triggerEvent(SampleEvent.Ignite, data);
+
+        expect(subscriber.calledWith(sinon.match({ data }))).to.equal(true);
     });
 
     it('notifies all the subscribers after a successful direct state transition', () => {
@@ -124,8 +134,18 @@ describe('StateMachine', () => {
 
         stateMachine.transition(SampleState.Idling);
 
-        expect(subscriberA.calledWith({ from: SampleState.Parked, to: SampleState.Idling })).to.equal(true);
-        expect(subscriberB.calledWith({ from: SampleState.Parked, to: SampleState.Idling })).to.equal(true);
+        expect(subscriberA.calledWith(sinon.match({ from: SampleState.Parked, to: SampleState.Idling }))).to.equal(true);
+        expect(subscriberB.calledWith(sinon.match({ from: SampleState.Parked, to: SampleState.Idling }))).to.equal(true);
+    });
+
+    it('passes additional data to all the subscribers after a successful direct state transition', () => {
+        const subscriber = sinon.spy();
+        const data = { message: 'Hello world' };
+
+        stateMachine.subscribe(subscriber);
+        stateMachine.transition(SampleState.Idling, data);
+
+        expect(subscriber.calledWith(sinon.match({ data }))).to.equal(true);
     });
 
     it('does not notify subscribers when transitioning to the same state', () => {

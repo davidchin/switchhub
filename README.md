@@ -85,6 +85,16 @@ stateMachine.transition('inactive');
 // stateMachine.getState() !== 'inactive'
 ```
 
+You can optionally pass meta data to subscribers when you transition to a new state.
+
+```js
+stateMachine.subscribe(transition) => {
+    // transition.data.message === 'Hello world'
+});
+
+stateMachine.triggerEvent('activate', { message: 'Hello world' });
+```
+
 ### Subscribe to changes
 
 You can subscribe to state changes.
