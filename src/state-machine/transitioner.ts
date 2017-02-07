@@ -30,18 +30,19 @@ export default class Transitioner {
     }
 
     /**
-     * Check if it is possible to undo/redo transition
-     * @param toState - The state to transition to
-     * @param fromState - The state to transition from
-     * @return True if it is possible to transition
+     * Check if it is possible to perform an undo
+     * @return True if it is possible to undo
      */
-    allowUndo(toState: Key, fromState: Key): boolean {
-        const transitions = this.transitions.filterTransitions({
-            from: fromState,
-            to: toState,
-        });
+    canUndo(): boolean {
+        return this.getTransitionForUndo() !== undefined;
+    }
 
-        return transitions.some(transition => transition.undoable === true);
+    /**
+     * Check if it is possible to perform a redo
+     * @return True if it is possible to redo
+     */
+    canRedo(): boolean {
+        return this.getTransitionForRedo() !== undefined;
     }
 
     /**
@@ -100,20 +101,22 @@ export default class Transitioner {
      * @param [callback] - The callback to fire once the transition is completed
      */
     undoTransition(callback?: (payload: SubscriberPayload) => void): void {
-        if (!this.history.getPreviousRecord()) {
+        const transition = this.getTransitionForUndo();
+        const record = this.history.getPreviousRecord();
+
+        if (!transition || !record) {
             return;
         }
 
-        const currentState = this.history.getCurrentRecord().state;
-        const { data, event, state } = this.history.getPreviousRecord()!;
-        const transition = this.findExecutableTransition(currentState, state);
+        this.history.rewindHistory();
 
-        if (transition && this.allowUndo(currentState, state)) {
-            this.history.rewindHistory();
-
-            if (callback) {
-                callback({ data, event, from: transition.to, to: transition.from });
-            }
+        if (callback) {
+            callback({
+                data: record.data,
+                event: transition.event,
+                from: transition.to,
+                to: transition.from,
+            });
         }
     }
 
@@ -122,20 +125,22 @@ export default class Transitioner {
      * @param [callback] - The callback to fire once the transition is completed
      */
     redoTransition(callback?: (payload: SubscriberPayload) => void): void {
-        if (!this.history.getNextRecord()) {
+        const transition = this.getTransitionForRedo();
+        const record = this.history.getNextRecord();
+
+        if (!transition || !record) {
             return;
         }
 
-        const currentState = this.history.getCurrentRecord().state;
-        const { data, event, state } = this.history.getNextRecord()!;
-        const transition = this.findExecutableTransition(state, currentState);
+        this.history.forwardHistory();
 
-        if (transition && this.allowUndo(state, currentState)) {
-            this.history.forwardHistory();
-
-            if (callback) {
-                callback({ data, event, from: transition.from, to: transition.to });
-            }
+        if (callback) {
+            callback({
+                data: record.data,
+                event: transition.event,
+                from: transition.from,
+                to: transition.to,
+            });
         }
     }
 
@@ -145,7 +150,7 @@ export default class Transitioner {
      * @param fromState - The state to transition from
      * @return The executable transition
      */
-    findExecutableTransition(toState: Key, fromState: Key): Transition | undefined {
+    private findExecutableTransition(toState: Key, fromState: Key): Transition | undefined {
         const transitions = this.transitions.filterExecutableTransitions({
             from: fromState,
             to: toState,
@@ -160,12 +165,52 @@ export default class Transitioner {
      * @param fromState - The state to transition from
      * @return The executable transition
      */
-    findExecutableTransitionByEvent(event: Key, fromState: Key): Transition | undefined {
+    private findExecutableTransitionByEvent(event: Key, fromState: Key): Transition | undefined {
         const transitions = this.transitions.filterExecutableTransitions({
             event,
             from: fromState,
         });
 
         return transitions[0];
+    }
+
+    /**
+     * Get a transition that can undo the current state
+     * @return The undoable transition
+     */
+    private getTransitionForUndo(): Transition | undefined {
+        if (!this.history.getPreviousRecord()) {
+            return;
+        }
+
+        const currentState = this.history.getCurrentRecord().state;
+        const { state } = this.history.getPreviousRecord()!;
+        const transition = this.findExecutableTransition(currentState, state);
+
+        if (!transition || !transition.undoable) {
+            return;
+        }
+
+        return transition;
+    }
+
+    /**
+     * Get a transition that can redo the previous state
+     * @return The redoable transition
+     */
+    private getTransitionForRedo(): Transition | undefined {
+        if (!this.history.getNextRecord()) {
+            return;
+        }
+
+        const currentState = this.history.getCurrentRecord().state;
+        const { state } = this.history.getNextRecord()!;
+        const transition = this.findExecutableTransition(state, currentState);
+
+        if (!transition || !transition.undoable) {
+            return;
+        }
+
+        return transition;
     }
 }

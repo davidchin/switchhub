@@ -211,6 +211,22 @@ export default class StateMachine {
     }
 
     /**
+     * Check if it is possible to perform an undo
+     * @return True if it is possible to undo
+     */
+    canUndo(): boolean {
+        return this.transitioner.canUndo();
+    }
+
+    /**
+     * Check if it is possible to perform an redo
+     * @return True if it is possible to redo
+     */
+    canRedo(): boolean {
+        return this.transitioner.canRedo();
+    }
+
+    /**
      * Subscribe to changes to the current state. When a change occurs, the
      * subscriber will get called.
      * @param subscriber - The subscriber function to add

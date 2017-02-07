@@ -106,8 +106,8 @@ describe('StateMachine', () => {
 
         stateMachine.triggerEvent(SampleEvent.Ignite);
 
-        expect(subscriberA.calledWith(sinon.match({ event: SampleEvent.Ignite, from: SampleState.Parked, to: SampleState.Idling }))).to.equal(true);
-        expect(subscriberB.calledWith(sinon.match({ event: SampleEvent.Ignite, from: SampleState.Parked, to: SampleState.Idling }))).to.equal(true);
+        expect(subscriberA.calledWith({ event: SampleEvent.Ignite, from: SampleState.Parked, to: SampleState.Idling })).to.equal(true);
+        expect(subscriberB.calledWith({ event: SampleEvent.Ignite, from: SampleState.Parked, to: SampleState.Idling })).to.equal(true);
     });
 
     it('passes additional data to all the subscribers after a successful state transition by event', () => {
@@ -134,8 +134,8 @@ describe('StateMachine', () => {
 
         stateMachine.transition(SampleState.Idling);
 
-        expect(subscriberA.calledWith(sinon.match({ from: SampleState.Parked, to: SampleState.Idling }))).to.equal(true);
-        expect(subscriberB.calledWith(sinon.match({ from: SampleState.Parked, to: SampleState.Idling }))).to.equal(true);
+        expect(subscriberA.calledWith({ from: SampleState.Parked, to: SampleState.Idling })).to.equal(true);
+        expect(subscriberB.calledWith({ from: SampleState.Parked, to: SampleState.Idling })).to.equal(true);
     });
 
     it('passes additional data to all the subscribers after a successful direct state transition', () => {
@@ -228,7 +228,7 @@ describe('StateMachine', () => {
         stateMachine.undoTransition();
 
         expect(stateMachine.getState()).to.equal(SampleState.Parked);
-        expect(subscriber.calledWith(sinon.match({ from: SampleState.Idling, to: SampleState.Parked }))).to.equal(true);
+        expect(subscriber.calledWith(sinon.match({ from: SampleState.Idling, to: SampleState.Parked, undo: true }))).to.equal(true);
     });
 
     it('does not undo a state transition if there is nothing to undo', () => {
@@ -251,6 +251,7 @@ describe('StateMachine', () => {
 
     it('redoes a state transition if there is a reverted state', () => {
         const subscriber = sinon.spy();
+        const data = { id: 1 };
 
         stateMachine = StateMachine.create(SampleState.Parked);
 
@@ -258,14 +259,14 @@ describe('StateMachine', () => {
             { from: SampleState.Parked, to: SampleState.Idling, undoable: true },
         ]);
         stateMachine.subscribe(subscriber);
-        stateMachine.triggerEvent(SampleEvent.Ignite);
+        stateMachine.triggerEvent(SampleEvent.Ignite, data);
         stateMachine.undoTransition();
 
         subscriber.reset();
         stateMachine.redoTransition();
 
         expect(stateMachine.getState()).to.equal(SampleState.Idling);
-        expect(subscriber.calledWith(sinon.match({ from: SampleState.Parked, to: SampleState.Idling }))).to.equal(true);
+        expect(subscriber.calledWith(sinon.match({ data, from: SampleState.Parked, to: SampleState.Idling, redo: true }))).to.equal(true);
     });
 
     it('does not redo a state transition if there is nothing to redo', () => {
@@ -285,6 +286,71 @@ describe('StateMachine', () => {
         stateMachine.redoTransition();
 
         expect(subscriber.callCount).to.equal(1);
+    });
+
+    it('returns true if it is possible to undo', () => {
+        stateMachine = StateMachine.create(SampleState.Parked);
+
+        stateMachine.addEvent(SampleEvent.Ignite, [
+            { from: SampleState.Parked, to: SampleState.Idling, undoable: true },
+        ]);
+
+        expect(stateMachine.canUndo()).to.equal(false);
+
+        stateMachine.triggerEvent(SampleEvent.Ignite);
+
+        expect(stateMachine.canUndo()).to.equal(true);
+
+        stateMachine.undoTransition();
+
+        expect(stateMachine.canUndo()).to.equal(false);
+    });
+
+    it('returns true if it is possible to redo', () => {
+        stateMachine = StateMachine.create(SampleState.Parked);
+
+        stateMachine.addEvent(SampleEvent.Ignite, [
+            { from: SampleState.Parked, to: SampleState.Idling, undoable: true },
+        ]);
+
+        expect(stateMachine.canRedo()).to.equal(false);
+
+        stateMachine.triggerEvent(SampleEvent.Ignite);
+
+        expect(stateMachine.canRedo()).to.equal(false);
+
+        stateMachine.undoTransition();
+
+        expect(stateMachine.canRedo()).to.equal(true);
+    });
+
+    it('returns false it is configured not to be undoable', () => {
+        stateMachine = StateMachine.create(SampleState.Parked);
+
+        stateMachine.addEvent(SampleEvent.Ignite, [
+            { from: SampleState.Parked, to: SampleState.Idling },
+        ]);
+
+        stateMachine.triggerEvent(SampleEvent.Ignite);
+
+        expect(stateMachine.canUndo()).to.equal(false);
+    });
+
+    it('returns false it is configured not to be redoable', () => {
+        let canTransition = true;
+
+        stateMachine = StateMachine.create(SampleState.Parked);
+
+        stateMachine.addEvent(SampleEvent.Ignite, [
+            { from: SampleState.Parked, to: SampleState.Idling, undoable: true, condition: () => canTransition },
+        ]);
+
+        stateMachine.triggerEvent(SampleEvent.Ignite);
+        stateMachine.undoTransition();
+
+        canTransition = false;
+
+        expect(stateMachine.canRedo()).to.equal(false);
     });
 
     it('clears all future states when there is a new transition', () => {
