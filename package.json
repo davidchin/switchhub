@@ -6,7 +6,7 @@
     "url": "https://github.com/davidchin/switchhub.git"
   },
   "homepage": "https://github.com/davidchin/switchhub",
-  "description": "A state machine for JavaScript and TypeScript",
+  "description": "An undoable state machine for JavaScript and TypeScript",
   "keywords": [
     "state machine",
     "finite state machine",

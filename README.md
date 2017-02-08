@@ -1,6 +1,6 @@
 # SwitchHub
 
-SwitchHub is a finite state machine written for JavaScript. It can help you manage the state of an object declaratively.
+SwitchHub is a finite state machine written for JavaScript. It can help you manage the state of an object declaratively. It can determine and transition to its future state by looking at its current state and your actions. Also, it can undo and redo transitions.
 
 [![Build Status](https://travis-ci.org/davidchin/switchhub.svg?branch=master)](https://travis-ci.org/davidchin/switchhub)
 
@@ -108,6 +108,8 @@ stateMachine.triggerEvent('activate');
 stateMachine.undoTransition();
 stateMachine.redoTransition();
 ```
+
+When passing data to `triggerEvent` or `transition`, make sure it is immutable. Otherwise, when you redo a transition, your subscribers might not get the same value.
 
 ### Subscribe to changes
 
