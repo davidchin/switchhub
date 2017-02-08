@@ -1,5 +1,19 @@
+<a name="1.0.0"></a>
+# [1.0.0](https://github.com/davidchin/switchhub/compare/0.2.1...1.0.0) (2017-02-08)
+
+
+### Features
+
+* Ability to create and configure a state machine at the same time ([dd64bb2](https://github.com/davidchin/switchhub/commit/dd64bb2))
+* Ability to undo and redo state transitions ([f0a991c](https://github.com/davidchin/switchhub/commit/f0a991c))
+* Ability to check if it is possible to undo or redo ([c32f06a](https://github.com/davidchin/switchhub/commit/c32f06a))
+* Ability to pass additional meta data to subscribers ([905c104](https://github.com/davidchin/switchhub/commit/905c104))
+* Rename `transitionByEvent` method to `triggerEvent` ([9bb73a0](https://github.com/davidchin/switchhub/commit/9bb73a0))
+
+
+
 <a name="0.2.1"></a>
-## [0.2.1](https://github.com/davidchin/switchhub/compare/0.2.0...v0.2.1) (2017-02-03)
+## [0.2.1](https://github.com/davidchin/switchhub/compare/0.2.0...0.2.1) (2017-02-03)
 
 
 ### Bug Fixes
